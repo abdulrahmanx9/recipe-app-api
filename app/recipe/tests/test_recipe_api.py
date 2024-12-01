@@ -213,12 +213,12 @@ class PrivateRecipeAPITest(TestCase):
         res = self.client.post(RECIPE_URL, payload, format='json')
         
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        recipes =  Recipe.objects.filter(user=self.user)
+        recipes = Recipe.objects.filter(user=self.user)
         self.assertEqual(recipes.count(), 1)
         recipe = recipes[0]
-        self.assertEqual(recipe.tag.count(), 2)
+        self.assertEqual(recipe.tags.count(), 2)
         for tag in payload['tags']:
-            exists = recipe.tag.filter(
+            exists = recipe.tags.filter(
                 name=tag['name'],
                 user=self.user,
             ).exists()
@@ -231,18 +231,18 @@ class PrivateRecipeAPITest(TestCase):
             'title': 'pongal',
             'time_minutes': 30,
             'price': Decimal('2.50'),
-            'tags': [{'name:': 'Indian'}, {'name': 'Breakfast'}]
+            'tags': [{'name': 'Indian'}, {'name': 'Breakfast'}]
         }
         res = self.client.post(RECIPE_URL, payload, format='json')
         
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        recipes =  Recipe.objects.filter(user=self.user)
+        recipes = Recipe.objects.filter(user=self.user)
         self.assertEqual(recipes.count(), 1)
         recipe = recipes[0]
-        self.assertEqual(recipe.tag.count(), 2)
-        self.assertIn(tag_indian, recipe.tag.all())
+        self.assertEqual(recipe.tags.count(), 2)
+        self.assertIn(tag_indian, recipe.tags.all())
         for tag in payload['tags']:
-            exists = recipe.tag.filter(
+            exists = recipe.tags.filter(
                 name=tag['name'],
                 user=self.user,
             ).exists()
