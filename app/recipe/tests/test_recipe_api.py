@@ -74,7 +74,7 @@ class PrivateRecipeAPITest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user(email="user@example.com", password="password123")
+        self.user = create_user(email="user@example.com", password="pasord123")
         self.client.force_authenticate(self.user)
 
     def test_retrieve_recipe(self):
@@ -183,13 +183,14 @@ class PrivateRecipeAPITest(TestCase):
     def test_update_user_returns_error(self):
         """Test changing the recipe user results in an error."""
 
-        new_user = create_user(email="test@example.com", password="sfdewf234rf32")
+        new_user = create_user(email="test@example.com", password="sfdew4rf32")
         recipe = create_recipe(user=self.user)
 
         payload = {"user": new_user.id}
         url = detail_url(recipe.id)
         res = self.client.patch(url, payload)
         recipe.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.user, self.user)
 
     def test_delete_recipe(self):
@@ -395,6 +396,46 @@ class PrivateRecipeAPITest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertNotIn(ingredient, recipe.ingredients.all())
         # self.assertEqual(recipe.ingredients.count(), 0)
+
+    def test_filter_by_tags(self):
+        """Test filtering recipes by tags."""
+        r1 = create_recipe(user=self.user, title="Kabsa")
+        r2 = create_recipe(user=self.user, title="Maqlouba")
+        t1 = Tag.objects.create(user=self.user, name="Saudi")
+        t2 = Tag.objects.create(user=self.user, name="Palestinian")
+        r1.tags.add(t1)
+        r2.tags.add(t2)
+        r3 = create_recipe(user=self.user, title="koshary")
+
+        params = {"tags": f"{t1.id},{t2.id}"}
+        res = self.client.get(RECIPE_URL, params)
+
+        s1 = RecipeSerializer(r1)
+        s2 = RecipeSerializer(r2)
+        s3 = RecipeSerializer(r3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
+
+    def test_filter_by_ingredient(self):
+        """Test filtering recipes by tags."""
+        r1 = create_recipe(user=self.user, title="Kabsa")
+        r2 = create_recipe(user=self.user, title="Maqlouba")
+        in1 = Ingredient.objects.create(user=self.user, name="Saudi")
+        in2 = Ingredient.objects.create(user=self.user, name="Palestinian")
+        r1.ingredients.add(in1)
+        r2.ingredients.add(in2)
+        r3 = create_recipe(user=self.user, title="koshary")
+
+        params = {"ingredients": f"{in1.id},{in2.id}"}
+        res = self.client.get(RECIPE_URL, params)
+
+        s1 = RecipeSerializer(r1)
+        s2 = RecipeSerializer(r2)
+        s3 = RecipeSerializer(r3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
 
 
 class ImageUploadTest(TestCase):
