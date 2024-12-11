@@ -18,25 +18,25 @@ INGREDIENT_URL = reverse("recipe:ingredient-list")
 
 
 def detail_url(ingredient_id):
-    """Create and return an ingredient detail url."""
+    """Create and return an ingredient detail URL."""
 
     return reverse("recipe:ingredient-detail", args=[ingredient_id])
 
 
 def create_user(email="user@example.com", password="password123"):
-    """Create and return a new user."""
+    """Create and return user."""
 
     return get_user_model().objects.create_user(email, password)
 
 
-class PuplicIngredientApiTest(TestCase):
+class PublicIngredientApiTest(TestCase):
     """Test unauthenticated API requests."""
 
     def setUp(self):
         self.client = APIClient()
 
     def test_auth_required(self):
-        """Test auth is required for retrieving ingredienta."""
+        """Test auth is required for retrieving ingredients."""
         res = self.client.get(INGREDIENT_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -120,8 +120,8 @@ class PrivateIngredientApiTest(TestCase):
 
         s1 = IngredientSerializer(in1)
         s2 = IngredientSerializer(in2)
-        self.assertEqual(s1.data, res.data)
-        self.assertNotEqual(s2.data, res.data)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
 
     def test_filtered_ingredient_unique(self):
         """Test filtered ingredient returns a unique list."""

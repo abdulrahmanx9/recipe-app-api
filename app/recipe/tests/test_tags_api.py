@@ -120,8 +120,8 @@ class PrivateTagsApiTests(TestCase):
 
         s1 = TagSerializer(tag1)
         s2 = TagSerializer(tag2)
-        self.assertEqual(s1.data, res.data)
-        self.assertNotEqual(s2.data, res.data)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
 
     def test_filtered_tag_unique(self):
         """Test filtered tag returns a unique list."""
