@@ -350,7 +350,9 @@ class PrivateRecipeAPITest(TestCase):
         self.assertEqual(recipe.ingredients.count(), 2)
         self.assertIn(ingredient, recipe.ingredients.all())
         for ingredient in payload["ingredients"]:
-            exists = recipe.ingredients.filter(name=ingredient["name"], user=self.user)
+            exists = recipe.ingredients.filter(
+                name=ingredient["name"], user=self.user
+            )
             self.assertTrue(exists)
 
     def test_create_ingredient_on_update(self):
@@ -443,7 +445,9 @@ class ImageUploadTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user(email="user@example.com", password="passwordbg123")
+        self.user = create_user(
+            email="user@example.com", password="passwordbg123"
+        )
         self.client.force_authenticate(self.user)
         self.recipe = create_recipe(user=self.user)
 
